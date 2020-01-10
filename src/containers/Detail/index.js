@@ -32,7 +32,7 @@ const Detail = ({navigation}) => {
     setTitle(path(['volumeInfo', 'title'], book));
     setISBN(
       industryIdentifiers
-        ? industryIdentifiers[industryIdentifiers.length - 1].identifier
+        ? industryIdentifiers.map(i => i.identifier).join(' / ')
         : 'Não definido',
     );
     setAuthors(authorsList ? authorsList.join(',') : 'Não definido');
