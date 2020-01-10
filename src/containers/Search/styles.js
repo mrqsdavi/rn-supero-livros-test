@@ -1,6 +1,8 @@
 import styled from 'styled-components/native';
 
-export const ListSectionWrapper = styled.ScrollView``;
+export const ListSectionWrapper = styled.ScrollView`
+  height: 100%;
+`;
 
 export const BookWrapper = styled.View`
   height: 100%;
