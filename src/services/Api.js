@@ -17,11 +17,14 @@ const create = (baseURL = 'https://www.googleapis.com/books/v1/') => {
 
   const books = (startIndex, search) =>
     api.get(
-      `volumes?q=${search}&fields=kind,items(id,volumeInfo/title,volumeInfo/authors, volumeInfo/publishedDate, volumeInfo/imageLinks)&printType=books&maxResults=10&startIndex=${startIndex}`,
+      `volumes?q=${search}&fields=kind,totalItems,items(id,volumeInfo/title,volumeInfo/authors, volumeInfo/publishedDate, volumeInfo/imageLinks, volumeInfo/industryIdentifiers)&printType=books&maxResults=10&startIndex=${startIndex}`,
     );
+
+  const detail = id => api.get(`volumes/${id}`);
 
   return {
     books,
+    detail,
   };
 };
 

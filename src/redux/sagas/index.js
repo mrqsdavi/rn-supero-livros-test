@@ -7,7 +7,7 @@ import {BookTypes} from '../ducks/BookRedux';
 
 /* ------------- Sagas ------------- */
 
-import {books} from './BookSagas';
+import {books, detail} from './BookSagas';
 
 /* ------------- API ------------- */
 
@@ -18,5 +18,8 @@ const api = API.create();
 /* ------------- Connect Types To Sagas ------------- */
 
 export default function* root() {
-  yield all([takeLatest(BookTypes.BOOKS, books, api)]);
+  yield all([
+    takeLatest(BookTypes.BOOKS, books, api),
+    takeLatest(BookTypes.DETAIL, detail, api),
+  ]);
 }

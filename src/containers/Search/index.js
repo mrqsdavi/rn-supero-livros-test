@@ -6,12 +6,14 @@ import {SafeAreaView} from 'react-navigation';
 import {Images} from '../../themes';
 import Loading from '../../components/Loading';
 import {BookActions, BookSelectors} from '../../redux/ducks/BookRedux';
+import _ from 'lodash';
 import * as S from './styles';
 
-const Search = () => {
+const Search = ({navigation}) => {
   const dispatch = useDispatch();
   const loading = useSelector(BookSelectors.selectLoading);
   const books = useSelector(BookSelectors.selectBooks);
+  const totalItems = useSelector(BookSelectors.selectTotalItems);
   const [search, setSearch] = useState('');
   const searchTimeout = useRef(null);
   const scrollRef = useRef(null);
@@ -29,7 +31,7 @@ const Search = () => {
 
     searchTimeout.current = setTimeout(() => {
       dispatch(BookActions.books(0, search));
-    }, 2000);
+    }, 1000);
   }, [search]);
 
   const nextPage = () => {
@@ -50,30 +52,12 @@ const Search = () => {
           style={{margin: 5}}
         />
         <List.Section>
-          <List.Subheader>Filtrar por ano de publicação</List.Subheader>
+          <List.Subheader>
+            {_.isEmpty(search)
+              ? 'Efetue a pesquisa dos livros'
+              : `${totalItems} livros encontrados`}
+          </List.Subheader>
         </List.Section>
-
-        <View
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-around',
-            alignItems: 'center',
-            marginBottom: 20,
-          }}>
-          <Button
-            icon="calendar"
-            mode="outline"
-            onPress={() => console.log('Pressed')}>
-            Ano Inicial
-          </Button>
-          <Button
-            icon="calendar"
-            mode="outline"
-            onPress={() => console.log('Pressed')}>
-            Ano Final
-          </Button>
-        </View>
 
         <S.ListSectionWrapper
           ref={scrollRef}
@@ -83,27 +67,32 @@ const Search = () => {
             }
           }}>
           <List.Section>
-            <List.Subheader>Some title</List.Subheader>
             {books.map((b, index) => {
-              if (!b.volumeInfo) {
-                return <View />;
-              }
               return (
                 <TouchableRipple
                   key={index}
-                  onPress={() => console.log('Pressed')}
+                  onPress={() => navigation.navigate('Detail', b)}
                   rippleColor="rgba(0, 0, 0, .32)">
                   <List.Item
                     title={`${b.volumeInfo.title}`}
-                    description={`Carl Sagan\nAno de Publicação: ${
+                    description={`Ano de Publicação: ${
                       b.volumeInfo.publishedDate
                         ? b.volumeInfo.publishedDate.split('-')[0]
                         : 'Não definido'
                     }\nAutores: ${(b.volumeInfo.authors
                       ? b.volumeInfo.authors
                       : []
-                    ).join(', ')}\nISBN: 9982747729797913737`}
+                    ).join(', ')}\nISBN: ${
+                      b.volumeInfo.industryIdentifiers
+                        ? b.volumeInfo.industryIdentifiers[
+                            b.volumeInfo.industryIdentifiers.length - 1
+                          ].identifier
+                        : ''
+                    }`}
                     descriptionNumberOfLines={5}
+                    right={() => (
+                      <List.Icon icon="chevron-right" style={{marginTop: 30}} />
+                    )}
                     left={() => (
                       <S.BookWrapper>
                         <S.Book
