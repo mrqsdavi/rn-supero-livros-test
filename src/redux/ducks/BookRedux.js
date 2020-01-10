@@ -39,7 +39,11 @@ export const INITIAL_STATE = Immutable({
 /* Reducers */
 
 export const booksRequest = (state, {startIndex}) =>
-  state.merge({loading: true});
+  state.merge({
+    loading: true,
+    books: startIndex == 0 ? [] : state.books,
+  });
+
 export const booksSuccess = (state, {books}) =>
   state.merge({loading: false, books: [...state.books, ...books]});
 export const booksFail = (state, {error}) =>

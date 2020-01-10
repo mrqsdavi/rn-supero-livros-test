@@ -14,6 +14,13 @@ const Search = () => {
   const books = useSelector(BookSelectors.selectBooks);
   const [search, setSearch] = useState('');
   const searchTimeout = useRef(null);
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    if (loading) {
+      scrollRef.current.scrollToEnd({animated: true});
+    }
+  }, [loading]);
 
   useEffect(() => {
     if (searchTimeout.current) {
@@ -69,6 +76,7 @@ const Search = () => {
         </View>
 
         <S.ListSectionWrapper
+          ref={scrollRef}
           onScroll={({nativeEvent}) => {
             if (isCloseToBottom(nativeEvent) && !loading) {
               nextPage();
@@ -77,9 +85,12 @@ const Search = () => {
           <List.Section>
             <List.Subheader>Some title</List.Subheader>
             {books.map((b, index) => {
+              if (!b.volumeInfo) {
+                return <View />;
+              }
               return (
                 <TouchableRipple
-                  key={b.id}
+                  key={index}
                   onPress={() => console.log('Pressed')}
                   rippleColor="rgba(0, 0, 0, .32)">
                   <List.Item
@@ -88,10 +99,20 @@ const Search = () => {
                       b.volumeInfo.publishedDate
                         ? b.volumeInfo.publishedDate.split('-')[0]
                         : 'Não definido'
-                    }\nISBN: 9982747729797913737`}
+                    }\nAutores: ${(b.volumeInfo.authors
+                      ? b.volumeInfo.authors
+                      : []
+                    ).join(', ')}\nISBN: 9982747729797913737`}
+                    descriptionNumberOfLines={5}
                     left={() => (
                       <S.BookWrapper>
-                        <S.Book source={Images.book_cover_sample} />
+                        <S.Book
+                          source={{
+                            uri: b.volumeInfo.imageLinks
+                              ? b.volumeInfo.imageLinks.thumbnail
+                              : 'https://www.generationsforpeace.org/wp-content/uploads/2018/03/empty.jpg',
+                          }}
+                        />
                       </S.BookWrapper>
                     )}
                   />
@@ -99,8 +120,8 @@ const Search = () => {
               );
             })}
           </List.Section>
+          {loading && <Loading />}
         </S.ListSectionWrapper>
-        {loading && <Loading />}
       </View>
     </SafeAreaView>
   );
